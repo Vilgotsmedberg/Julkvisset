@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Host - Julkvisset</title>
+  <style>
+    .option {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      text-align: center;
+      line-height: 100px;
+      font-size: 20px;
+      color: white;
+      cursor: pointer;
+    }
+    .red { background-color: red; }
+    .blue { background-color: blue; }
+    .green { background-color: green; }
+    .yellow { background-color: yellow; }
+    #countdown {
+      display: none;
+      font-size: 100px;
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <h1>Julkvisset 2024</h1>
+  <div id="lobby">
+    <h2>Lobby</h2>
+    <div id="players"></div>
+    <button onclick="startQuiz()">Start Quiz</button>
+  </div>
+  <div id="countdown"></div>
+  <div id="question" style="display: none;"></div>
+  <div id="options" style="display: none;"></div>
+  <div id="podium" style="display: none;">
+    <h2>Podium</h2>
+    <div id="topPlayers"></div>
+    <button id="nextButton" onclick="nextQuestion()">Next Question</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function startQuiz() {
+      socket.emit('startQuiz');
+      document.getElementById('lobby').style.display = 'none';
+    }
+
+    function nextQuestion() {
+      socket.emit('nextQuestion');
+      document.getElementById('podium').style.display = 'none';
+    }
+
+    socket.on('updatePlayers', (players) => {
+      const playersDiv = document.getElementById('players');
+      playersDiv.innerHTML = '';
+      for (const player of Object.values(players)) {
+        const div = document.createElement('div');
+        div.innerHTML = player.name;
+        playersDiv.appendChild(div);
+      }
+    });
+
+    socket.on('countdown', (count) => {
+      const countdownDiv = document.getElementById('countdown');
+      countdownDiv.style.display = 'block';
+      countdownDiv.innerHTML = count;
+      if (count === 0) {
+        countdownDiv.style.display = 'none';
+      }
+    });
+
+    socket.on('question', (data) => {
+      document.getElementById('countdown').style.display = 'none';
+      document.getElementById('podium').style.display = 'none';
+      document.getElementById('question').style.display = 'block';
+      document.getElementById('options').style.display = 'block';
+      document.getElementById('question').innerHTML = data.question;
+      const optionsDiv = document.getElementById('options');
+      optionsDiv.innerHTML = '';
+      const colors = ['red', 'blue', 'green', 'yellow'];
+      data.options.forEach((option, index) => {
+        const div = document.createElement('div');
+        div.className = `option ${colors[index]}`;
+        div.innerHTML = option;
+        optionsDiv.appendChild(div);
+      });
+    });
+
+    socket.on('updateScores', (players) => {
+      const topPlayers = Object.values(players).sort((a, b) => b.score - a.score).slice(0, 5);
+      const topPlayersDiv = document.getElementById('topPlayers');
+      topPlayersDiv.innerHTML = '';
+      topPlayers.forEach((player, index) => {
+        const div = document.createElement('div');
+        div.innerHTML = `${index + 1}. ${player.name} - ${player.score} points`;
+        topPlayersDiv.appendChild(div);
+      });
+      document.getElementById('question').style.display = 'none';
+      document.getElementById('options').style.display = 'none';
+      document.getElementById('podium').style.display = 'block';
+    });
+
+    socket.on('showResults', (topPlayers) => {
+      const topPlayersDiv = document.getElementById('topPlayers');
+      topPlayersDiv.innerHTML = '';
+      topPlayers.forEach((player, index) => {
+        const div = document.createElement('div');
+        div.innerHTML = `${index + 1}. ${player.name} - ${player.score} points`;
+        topPlayersDiv.appendChild(div);
+      });
+      document.getElementById('question').style.display = 'none';
+      document.getElementById('options').style.display = 'none';
+      document.getElementById('podium').style.display = 'block';
+      const nextButton = document.getElementById('nextButton');
+      nextButton.innerHTML = 'Show Results';
+      nextButton.onclick = () => {
+        nextButton.style.display = 'none';
+      };
+    });
+  </script>
+</body>
+</html>

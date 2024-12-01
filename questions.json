@@ -1,0 +1,12 @@
+[
+    {
+      "question": "What is the capital of Sweden?",
+      "options": ["Stockholm", "Gothenburg", "Malmö", "Uppsala"],
+      "correctAnswer": "Stockholm"
+    },
+    {
+      "question": "Which day is Christmas celebrated?",
+      "options": ["24th December", "25th December", "26th December", "31st December"],
+      "correctAnswer": "25th December"
+    }
+  ]

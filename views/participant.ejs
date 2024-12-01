@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Participant - Julkvisset</title>
+  <style>
+    .option {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      text-align: center;
+      line-height: 100px;
+      font-size: 20px;
+      color: white;
+      cursor: pointer;
+    }
+    .red { background-color: red; }
+    .blue { background-color: blue; }
+    .green { background-color: green; }
+    .yellow { background-color: yellow; }
+  </style>
+</head>
+<body>
+  <h1 id="welcomeText">Varmt välkommen till 2FNA's Julkviss!</h1>
+  <h2 id="namePrompt">Skriv in ditt namn tack :)</h2>
+  <div id="nameInput">
+    <input type="text" id="playerName" placeholder="Vilgot Smedberg">
+    <button onclick="joinQuiz()">Anslut</button>
+  </div>
+  <div id="welcome" style="display: none;">
+    <h2><span id="username"></span> är nu ansluten! Ser du ditt namn på skärmen? :)</h2>
+  </div>
+  <div id="options" style="display: none;">
+    <div class="option red" onclick="sendAnswer('red')"></div>
+    <div class="option blue" onclick="sendAnswer('blue')"></div>
+    <div class="option green" onclick="sendAnswer('green')"></div>
+    <div class="option yellow" onclick="sendAnswer('yellow')"></div>
+  </div>
+  <div id="result" style="display: none;">
+    <h2 id="resultMessage"></h2>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let playerName = '';
+
+    function joinQuiz() {
+      playerName = document.getElementById('playerName').value;
+      if (playerName) {
+        socket.emit('joinQuiz', playerName);
+        document.getElementById('nameInput').style.display = 'none';
+        document.getElementById('welcome').style.display = 'block';
+        document.getElementById('username').innerText = playerName;
+      } else {
+        alert('Please enter your name');
+      }
+    }
+
+    function sendAnswer(color) {
+      socket.emit('answer', { name: playerName, color });
+      document.getElementById('options').style.display = 'none';
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('resultMessage').innerText = `You chose ${color}, but were you fast enough?`;
+    }
+
+    socket.on('question', (data) => {
+      document.getElementById('welcome').style.display = 'none';
+      document.getElementById('options').style.display = 'block';
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('welcomeText').style.display = 'none';
+      document.getElementById('namePrompt').style.display = 'none';
+    });
+
+    socket.on('answerResult', (data) => {
+      const resultMessage = document.getElementById('resultMessage');
+      if (data.correct) {
+        resultMessage.innerText = 'Congrats! You were correct!';
+      } else {
+        resultMessage.innerText = 'Ahh, unfortunately you were incorrect!';
+      }
+    });
+  </script>
+</body>
+</html>
