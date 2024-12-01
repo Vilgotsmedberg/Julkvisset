@@ -6,13 +6,19 @@ const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const questions = JSON.parse(fs.readFileSync('questions.json', 'utf8'));
+const questionsPath = path.join(__dirname, 'questions.json');
+const questions = JSON.parse(fs.readFileSync(questionsPath, 'utf8'));
 let currentQuestionIndex = 0;
 let players = {};
 let answers = {};
@@ -124,4 +130,7 @@ io.on('connection', (socket) => {
   }
 });
 
-module.exports = server;
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

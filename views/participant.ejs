@@ -26,9 +26,9 @@
 
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script>
-    const socket = io('http://localhost:3000'); // Connect to local server
+    const socket = io();
     let playerName = '';
-
+  
     function joinQuiz() {
       playerName = document.getElementById('playerName').value;
       if (playerName) {
@@ -40,14 +40,14 @@
         alert('Please enter your name');
       }
     }
-
+  
     function sendAnswer(color) {
       socket.emit('answer', { name: playerName, color });
       document.getElementById('options').style.display = 'none';
       document.getElementById('result').style.display = 'block';
       document.getElementById('resultMessage').innerText = `You chose ${color}, but were you fast enough?`;
     }
-
+  
     socket.on('question', (data) => {
       document.getElementById('welcome').style.display = 'none';
       document.getElementById('options').style.display = 'block';
@@ -55,7 +55,7 @@
       document.getElementById('welcomeText').style.display = 'none';
       document.getElementById('namePrompt').style.display = 'none';
     });
-
+  
     socket.on('answerResult', (data) => {
       const resultMessage = document.getElementById('resultMessage');
       if (data.correct) {

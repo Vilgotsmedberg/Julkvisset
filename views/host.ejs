@@ -5,7 +5,7 @@
   <link rel="stylesheet" type="text/css" href="/css/host.css">
 </head>
 <body>
-  <h1>Julkvisset 2024</h1>
+  <h1>Julkvizzet 2025</h1>
   <div id="lobby">
     <div>
       <h2>Lobby</h2>
@@ -24,18 +24,18 @@
 
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script>
-    const socket = io('http://localhost:3000'); // Connect to local server
-
+    const socket = io();
+  
     function startQuiz() {
       socket.emit('startQuiz');
       document.getElementById('lobby').style.display = 'none';
     }
-
+  
     function nextQuestion() {
       socket.emit('nextQuestion');
       document.getElementById('podium').style.display = 'none';
     }
-
+  
     socket.on('updatePlayers', (players) => {
       const playersDiv = document.getElementById('players');
       playersDiv.innerHTML = '';
@@ -45,7 +45,7 @@
         playersDiv.appendChild(div);
       }
     });
-
+  
     socket.on('countdown', (count) => {
       const countdownDiv = document.getElementById('countdown');
       countdownDiv.style.display = 'block';
@@ -54,7 +54,7 @@
         countdownDiv.style.display = 'none';
       }
     });
-
+  
     socket.on('question', (data) => {
       document.getElementById('countdown').style.display = 'none';
       document.getElementById('podium').style.display = 'none';
@@ -71,7 +71,7 @@
         optionsDiv.appendChild(div);
       });
     });
-
+  
     socket.on('updateScores', (players) => {
       const topPlayers = Object.values(players).sort((a, b) => b.score - a.score).slice(0, 5);
       const topPlayersDiv = document.getElementById('topPlayers');
@@ -85,7 +85,7 @@
       document.getElementById('options').style.display = 'none';
       document.getElementById('podium').style.display = 'block';
     });
-
+  
     socket.on('showResults', (topPlayers) => {
       const topPlayersDiv = document.getElementById('topPlayers');
       topPlayersDiv.innerHTML = '';
@@ -103,6 +103,7 @@
         nextButton.style.display = 'none';
       };
     });
+  </script>
   </script>
 </body>
 </html>
