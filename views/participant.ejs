@@ -2,23 +2,7 @@
 <html>
 <head>
   <title>Participant - Julkvisset</title>
-  <style>
-    .option {
-      display: inline-block;
-      width: 100px;
-      height: 100px;
-      margin: 10px;
-      text-align: center;
-      line-height: 100px;
-      font-size: 20px;
-      color: white;
-      cursor: pointer;
-    }
-    .red { background-color: red; }
-    .blue { background-color: blue; }
-    .green { background-color: green; }
-    .yellow { background-color: yellow; }
-  </style>
+  <link rel="stylesheet" type="text/css" href="/css/participant.css">
 </head>
 <body>
   <h1 id="welcomeText">Varmt välkommen till 2FNA's Julkviss!</h1>
@@ -40,9 +24,9 @@
     <h2 id="resultMessage"></h2>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script>
-    const socket = io();
+    const socket = io('http://localhost:3000'); // Connect to local server
     let playerName = '';
 
     function joinQuiz() {
@@ -75,7 +59,7 @@
     socket.on('answerResult', (data) => {
       const resultMessage = document.getElementById('resultMessage');
       if (data.correct) {
-        resultMessage.innerText = 'Congrats! You were correct!';
+        resultMessage.innerText = `Congrats! You were correct and earned ${data.points} points!`;
       } else {
         resultMessage.innerText = 'Ahh, unfortunately you were incorrect!';
       }

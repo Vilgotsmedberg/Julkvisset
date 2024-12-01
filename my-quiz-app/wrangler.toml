@@ -1,0 +1,7 @@
+name = "my-quiz-app"
+type = "javascript"
+
+account_id = "8caf3e6e7c2e811dd09b3923d9388f2e"
+workers_dev = true
+route = ""
+zone_id = ""

@@ -31,25 +31,29 @@ app.get('/participant', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('A user connected:', socket.id);
 
   socket.on('disconnect', () => {
-    console.log('A user disconnected');
+    console.log('A user disconnected:', socket.id);
     delete players[socket.id];
     io.emit('updatePlayers', players);
   });
 
   socket.on('joinQuiz', (name) => {
+    console.log('joinQuiz event received:', name);
     players[socket.id] = { name, score: 0 };
     io.emit('updatePlayers', players);
+    console.log('Current players:', players);
   });
 
   socket.on('startQuiz', () => {
+    console.log('startQuiz event received');
     currentQuestionIndex = 0;
     startCountdown();
   });
 
   socket.on('answer', (data) => {
+    console.log('answer event received:', data);
     const answerTime = Date.now();
     const timeTaken = answerTime - questionStartTime;
     answers[socket.id] = { ...data, timeTaken };
@@ -59,6 +63,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('nextQuestion', () => {
+    console.log('nextQuestion event received');
     if (currentQuestionIndex < questions.length) {
       startCountdown();
     } else {
@@ -67,6 +72,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('resetQuiz', () => {
+    console.log('resetQuiz event received');
     currentQuestionIndex = 0;
     players = {};
     answers = {};
@@ -118,7 +124,4 @@ io.on('connection', (socket) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+module.exports = server;
